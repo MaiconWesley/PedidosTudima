@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tudima - Pedidos</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffc107">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Tudima - Pedidos">
+  <meta name="application-name" content="Tudima - Pedidos">
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('Service Worker registrado:', reg))
+          .catch(err => console.error('Erro ao registrar:', err));
+      });
+    }
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff9cc;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    header {
+      text-align: center;
+      padding: 1rem;
+    }
+    .logo {
+      max-width: 150px;
+    }
+    .button-pedido {
+      width: 3.2rem;
+      height: 3.2rem;
+      padding: 0.5rem;
+      margin: 0.2rem;
+      font-size: 1.5rem;
+      border: none;
+      border-radius: 12px;
+      background-color: #ffc107;
+      color: white;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .button {
+      width: 80%;
+      padding: 1rem;
+      margin: 1rem;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 12px;
+      background-color: #ffc107;
+      color: white;
+      font-weight: bold;
+    }
+    .hidden {
+      display: none;
+    }
+    .form-container, .list-container {
+      width: 90%;
+      max-width: 400px;
+    }
+    input, textarea, select {
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    .save-button {
+      background-color: #00c851;
+    }
+    .delete-button {
+      background-color: #ff4444;
+    }
+    .back-button {
+      background-color: #999;
+    }
+    .save-button, .delete-button, .back-button {
+      color: white;
+      font-size: 1rem;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 10px;
+      margin-top: 0.5rem;
+    }
+    .pedido-button {
+      width: 100%;
+      margin: 0.3rem 0;
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      color: white;
+    }
+    .afazer { background-color: #ff4444; }
+    .fazendo { background-color: #ffbb33; }
+    .concluido { background-color: #00c851; }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Tudima Logo" class="logo">
+  </header>
+
+  <main>
+    <div id="home">
+      <button class="button" onclick="mostrarCadastro()">Cadastro de Pedido</button>
+      <button class="button" onclick="mostrarPedidos()">Visualizar Pedido</button>
+    </div>
+
+    <div id="cadastro" class="hidden form-container">
+      <h2>Novo Pedido</h2>
+      <input type="text" id="nome" placeholder="Nome do cliente">
+      <textarea id="descricao" placeholder="Descrição do pedido"></textarea>
+      <select id="situacao">
+        <option value="afazer">A Fazer</option>
+        <option value="fazendo">Fazendo</option>
+        <option value="concluido">Concluído</option>
+      </select>
+      <button class="save-button" onclick="gravarPedido()">Gravar Pedido</button>
+      <button class="delete-button" onclick="excluirPedido()" id="btnExcluir">Excluir Pedido</button>
+      <button class="back-button" onclick="voltarHome()">Voltar</button>
+    </div>
+
+    <div id="pedidos" class="hidden list-container">
+      <h2>Pedidos</h2>
+      <input type="text" id="busca" placeholder="Buscar por nome..." oninput="atualizarLista()" style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:8px; border:1px solid #ccc">
+
+      <div style="margin-bottom: 1rem; display: flex; justify-content: space-around;">
+        <button class="button-pedido" onclick="filtrarPorStatus('todos')" title="Todos">📋</button>
+        <button class="button-pedido" onclick="filtrarPorStatus('afazer')" title="A Fazer">🟥</button>
+        <button class="button-pedido" onclick="filtrarPorStatus('fazendo')" title="Fazendo">🟧</button>
+        <button class="button-pedido" onclick="filtrarPorStatus('concluido')" title="Concluído">✅</button>
+      </div>
+      <div id="listaPedidos"></div>
+      <button class="back-button" onclick="voltarHome()">Voltar</button>
+    </div>
+  </main>
+
+  <script type="module">
+    // código JavaScript mantido como está...
+  </script>
+
+  <div id="toast" style="
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.4s;
+    z-index: 9999;
+    font-size: 1rem;
+  "></div>
+</body>
+</html>
