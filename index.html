@@ -7,92 +7,373 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ffc107">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Tudima - Pedidos">
-  <meta name="application-name" content="Tudima - Pedidos">
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('service-worker.js')
-          .then(reg => console.log('SW registrado:', reg))
-          .catch(err => console.error('Erro SW:', err));
+          .then(reg => console.log('Service Worker registrado:', reg))
+          .catch(err => console.error('Erro ao registrar:', err));
       });
     }
   </script>
   <style>
-    body, html { height: 100%; margin: 0; font-family: Arial,sans-serif; background:#fff9cc; }
-    header { text-align:center; padding:1rem; }
-    .logo { max-width:150px; }
-    #home { display:flex; gap:3rem; justify-content:center; align-items:center; height:80vh; }
-    .home-button { background:#ffc107; border:none; border-radius:20px; width:160px; height:160px; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; font-weight:bold; font-size:1.2rem; cursor:pointer; box-shadow:0 4px 6px rgba(0,0,0,0.2); transition:background .3s; }
-    .home-button:hover { background:#e6b800; }
-    .home-button .icon { font-size:3.5rem; margin-bottom:.5rem; }
-    .hidden { display:none!important; }
-    .form-container, .list-container { width:90%; max-width:400px; margin:2rem auto; }
-    input, textarea, select { width:100%; margin:.5rem 0; padding:.75rem; font-size:1rem; border:1px solid #ccc; border-radius:10px; }
-    button { width:100%; padding:.8rem; font-size:1rem; border:none; border-radius:10px; margin-top:.5rem; cursor:pointer; color:#fff; }
-    .save-button { background:#00c851; }
-    .delete-button { background:#ff4444; }
-    .back-button { background:#999; }
-    .pedido-button { width:100%; margin:.3rem 0; padding:1rem; font-size:1.1rem; font-weight:bold; border:none; border-radius:10px; color:#fff; text-align:left; }
-    .pedido-data { font-size:.9rem; color:#222; opacity:.7; }
-    .afazer { background:#ff4444; }
-    .fazendo { background:#ffbb33; }
-    .concluido { background:#00c851; }
+    body, html {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fff9cc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    header {
+      text-align: center;
+      padding: 1rem;
+      position: absolute;
+      top: 0;
+      width: 100%;
+    }
+    .logo {
+      max-width: 150px;
+    }
+    /* Tela inicial: centraliza dois botões grandes com ícones e texto */
+    #home {
+      display: flex;
+      gap: 3rem;
+    }
+    .home-button {
+      background-color: #ffc107;
+      border-radius: 20px;
+      border: none;
+      width: 160px;
+      height: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      transition: background-color 0.3s;
+    }
+    .home-button:hover {
+      background-color: #e6b800;
+    }
+    .home-button .icon {
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+      line-height: 1;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .form-container, .list-container {
+      width: 90%;
+      max-width: 400px;
+      margin-top: 2rem;
+    }
+    input, textarea, select {
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    .save-button {
+      background-color: #00c851;
+    }
+    .delete-button {
+      background-color: #ff4444;
+    }
+    .back-button {
+      background-color: #999;
+    }
+    .save-button, .delete-button, .back-button {
+      color: white;
+      font-size: 1rem;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 10px;
+      margin-top: 0.5rem;
+      width: 100%;
+      cursor: pointer;
+    }
+    .pedido-button {
+      width: 100%;
+      margin: 0.3rem 0;
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      text-align: left;
+    }
+    .pedido-data {
+      font-size: 0.9rem;
+      color: #222;
+      margin-top: 0.2rem;
+      opacity: 0.7;
+    }
+    .afazer { background-color: #ff4444; }
+    .fazendo { background-color: #ffbb33; }
+    .concluido { background-color: #00c851; }
   </style>
 </head>
 <body>
-  <header><img src="logo.png" alt="Tudima Logo" class="logo"></header>
+  <header>
+    <img src="logo.png" alt="Tudima Logo" class="logo" />
+  </header>
+
   <main>
     <div id="home">
-      <button class="home-button" id="btnHomeCadastro"><div class="icon">📝</div>Cadastro</button>
-      <button class="home-button" id="btnHomePedidos"><div class="icon">📋</div>Pedidos</button>
+      <button class="home-button" onclick="mostrarCadastro()" aria-label="Cadastro de Pedido">
+        <div class="icon">📝</div>
+        Cadastro
+      </button>
+      <button class="home-button" onclick="mostrarPedidos()" aria-label="Visualizar Pedidos">
+        <div class="icon">📋</div>
+        Pedidos
+      </button>
     </div>
+
     <div id="cadastro" class="hidden form-container">
       <h2>Novo Pedido</h2>
-      <input type="text" id="nome" placeholder="Nome do cliente">
+      <input type="text" id="nome" placeholder="Nome do cliente" />
       <textarea id="descricao" placeholder="Descrição do pedido"></textarea>
-      <input type="date" id="prazoEntrega">
-      <select id="situacao"><option value="afazer">A Fazer</option><option value="fazendo">Fazendo</option><option value="concluido">Concluído</option></select>
-      <button class="save-button" id="btnSalvar">Gravar Pedido</button>
-      <button class="delete-button" id="btnExcluir">Excluir Pedido</button>
-      <button class="back-button" id="btnVoltar1">Voltar</button>
+      <input type="date" id="prazoEntrega" placeholder="Prazo de Entrega" />
+      <select id="situacao">
+        <option value="afazer">A Fazer</option>
+        <option value="fazendo">Fazendo</option>
+        <option value="concluido">Concluído</option>
+      </select>
+      <button class="save-button" onclick="gravarPedido()">Gravar Pedido</button>
+      <button class="delete-button" onclick="excluirPedido()" id="btnExcluir">Excluir Pedido</button>
+      <button class="back-button" onclick="voltarHome()">Voltar</button>
     </div>
+
     <div id="pedidos" class="hidden list-container">
       <h2>Pedidos</h2>
-      <input type="text" id="busca" placeholder="Buscar por nome...">
-      <div style="display:flex;justify-content:space-around;margin:1rem 0;">
-        <button class="pedido-button" data-status="todos">📋 Todos</button>
-        <button class="pedido-button afazer" data-status="afazer">🟥</button>
-        <button class="pedido-button fazendo" data-status="fazendo">🟧</button>
-        <button class="pedido-button concluido" data-status="concluido">✅</button>
+      <input
+        type="text"
+        id="busca"
+        placeholder="Buscar por nome..."
+        oninput="atualizarLista()"
+        style="width:100%; padding:0.5rem; margin-bottom:0.5rem; border-radius:8px; border:1px solid #ccc"
+      />
+
+      <div style="margin-bottom: 1rem; display: flex; justify-content: space-around;">
+        <button class="button-pedido" onclick="filtrarPorStatus('todos')" title="Todos">📋</button>
+        <button class="button-pedido" onclick="filtrarPorStatus('afazer')" title="A Fazer">🟥</button>
+        <button class="button-pedido" onclick="filtrarPorStatus('fazendo')" title="Fazendo">🟧</button>
+        <button class="button-pedido" onclick="filtrarPorStatus('concluido')" title="Concluído">✅</button>
       </div>
       <div id="listaPedidos"></div>
-      <button class="back-button" id="btnVoltar2">Voltar</button>
+      <button class="back-button" onclick="voltarHome()">Voltar</button>
     </div>
   </main>
+
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
-    import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
-    const firebaseConfig = { /* ... */ };
+    import {
+      initializeApp
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      updateDoc,
+      deleteDoc,
+      doc,
+      onSnapshot
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDpJfDq7cnqf10CCa4VGSYNbkvPg-kHpQ",
+      authDomain: "tudimapedidos.firebaseapp.com",
+      projectId: "tudimapedidos",
+      storageBucket: "tudimapedidos.firebasestorage.app",
+      messagingSenderId: "368667045110",
+      appId: "1:368667045110:web:756e34bfe0f9af721e10d7",
+      measurementId: "G-6XVGS0HH4D"
+    };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const pedidosRef = collection(db,'pedidos');
-    let pedidos=[]; let editId=null; let filter='todos';
-    const home=document.getElementById('home'), cad=document.getElementById('cadastro'), ped=document.getElementById('pedidos');
-    document.getElementById('btnHomeCadastro').onclick=()=>{home.classList.add('hidden'); cad.classList.remove('hidden');};
-    document.getElementById('btnHomePedidos').onclick=()=>{home.classList.add('hidden'); ped.classList.remove('hidden'); renderList();};
-    document.getElementById('btnVoltar1').onclick=()=>{cad.classList.add('hidden'); home.classList.remove('hidden');};
-    document.getElementById('btnVoltar2').onclick=()=>{ped.classList.add('hidden'); home.classList.remove('hidden');};
-    document.getElementById('btnSalvar').onclick=async()=>{/* handle save with validations */};
-    document.getElementById('btnExcluir').onclick=async()=>{/* handle delete */};
-    onSnapshot(pedidosRef,snap=>{pedidos=snap.docs.map(d=>({id:d.id,...d.data()})); console.log('sync');});
-    function renderList(){const l=document.getElementById('listaPedidos'); l.innerHTML=''; pedidos.filter(p=>filter==='todos'||p.situacao===filter).forEach(p=>{const b=document.createElement('button');b.className='pedido-button '+p.situacao; b.textContent=p.nome+' - '+p.prazoEntrega; b.onclick=()=>{home.classList.add('hidden'); cad.classList.remove('hidden');/* load p */};l.append(b);});}
-    document.getElementById('busca').oninput=renderList;
-    document.querySelectorAll('[data-status]').forEach(btn=>btn.onclick=()=>{filter=btn.dataset.status; renderList();});
+    const pedidosRef = collection(db, "pedidos");
+
+    let pedidos = [];
+    let editandoId = null;
+    let filtroAtual = "todos";
+
+    onSnapshot(pedidosRef, (snapshot) => {
+      const novosPedidos = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      const houveMudanca = JSON.stringify(pedidos) !== JSON.stringify(novosPedidos);
+      pedidos = novosPedidos;
+      if (houveMudanca) {
+        atualizarLista();
+      }
+    });
+
+    window.gravarPedido = async function () {
+      const nome = document.getElementById("nome").value.trim();
+      const descricao = document.getElementById("descricao").value.trim();
+      const prazoEntrega = document.getElementById("prazoEntrega").value;
+      const situacao = document.getElementById("situacao").value;
+
+      if (!nome) {
+        showToast("Preencha o nome do cliente.");
+        return;
+      }
+      if (!descricao) {
+        showToast("Preencha a descrição do pedido.");
+        return;
+      }
+      if (!prazoEntrega) {
+        showToast("Preencha o prazo de entrega.");
+        return;
+      }
+
+      try {
+        if (editandoId) {
+          await updateDoc(doc(db, "pedidos", editandoId), {
+            nome,
+            descricao,
+            prazoEntrega,
+            situacao
+          });
+          showToast("Pedido alterado com sucesso!");
+        } else {
+          await addDoc(pedidosRef, {
+            nome,
+            descricao,
+            prazoEntrega,
+            situacao
+          });
+          showToast("Pedido salvo com sucesso!");
+        }
+        editandoId = null;
+        mostrarPedidos();
+      } catch (error) {
+        showToast("Erro ao salvar o pedido: " + error.message);
+        console.error("Erro ao salvar:", error);
+      }
+    };
+
+    window.excluirPedido = async function () {
+      if (editandoId && confirm("Tem certeza que deseja excluir este pedido?")) {
+        try {
+          await deleteDoc(doc(db, "pedidos", editandoId));
+          showToast("Pedido excluído com sucesso!");
+          editandoId = null;
+          mostrarPedidos();
+        } catch (error) {
+          showToast("Erro ao excluir o pedido.");
+          console.error(error);
+        }
+      }
+    };
+
+    window.mostrarCadastro = function (index = null) {
+      document.getElementById("home").classList.add("hidden");
+      document.getElementById("pedidos").classList.add("hidden");
+      document.getElementById("cadastro").classList.remove("hidden");
+
+      const btnExcluir = document.getElementById("btnExcluir");
+
+      if (index !== null) {
+        const pedido = pedidos[index];
+        document.getElementById("nome").value = pedido.nome;
+        document.getElementById("descricao").value = pedido.descricao;
+        document.getElementById("prazoEntrega").value = pedido.prazoEntrega || "";
+        document.getElementById("situacao").value = pedido.situacao;
+        editandoId = pedido.id;
+        btnExcluir.style.display = "inline-block";
+      } else {
+        document.getElementById("nome").value = "";
+        document.getElementById("descricao").value = "";
+        document.getElementById("prazoEntrega").value = "";
+        document.getElementById("situacao").value = "afazer";
+        editandoId = null;
+        btnExcluir.style.display = "none";
+      }
+    };
+
+    window.filtrarPorStatus = function (status) {
+      filtroAtual = status;
+      atualizarLista();
+    };
+
+    window.atualizarLista = function () {
+      const lista = document.getElementById("listaPedidos");
+      const busca = document.getElementById("busca").value.toLowerCase();
+      lista.innerHTML = "";
+
+      pedidos.forEach((pedido, index) => {
+        const nome = pedido.nome.toLowerCase();
+        if ((filtroAtual === "todos" || pedido.situacao === filtroAtual) && nome.includes(busca)) {
+          const btn = document.createElement("button");
+          btn.className = `pedido-button ${pedido.situacao}`;
+          btn.onclick = () => mostrarCadastro(index);
+
+          const nomeDiv = document.createElement("div");
+          nomeDiv.textContent = pedido.nome;
+          nomeDiv.style.fontWeight = "bold";
+
+          const prazoDiv = document.createElement("div");
+          prazoDiv.className = "pedido-data";
+          prazoDiv.textContent = pedido.prazoEntrega ? `Entrega até: ${pedido.prazoEntrega}` : "";
+
+          btn.appendChild(nomeDiv);
+          btn.appendChild(prazoDiv);
+
+          lista.appendChild(btn);
+        }
+      });
+    };
+
+    window.mostrarPedidos = function () {
+      document.getElementById("home").classList.add("hidden");
+      document.getElementById("cadastro").classList.add("hidden");
+      document.getElementById("pedidos").classList.remove("hidden");
+      atualizarLista();
+    };
+
+    window.voltarHome = function () {
+      document.getElementById("cadastro").classList.add("hidden");
+      document.getElementById("pedidos").classList.add("hidden");
+      document.getElementById("home").classList.remove("hidden");
+    };
+
+    window.showToast = function (mensagem) {
+      const toast = document.getElementById("toast");
+      toast.textContent = mensagem;
+      toast.style.opacity = "1";
+      setTimeout(() => {
+        toast.style.opacity = "0";
+      }, 3000);
+    };
   </script>
+
+  <div id="toast" style="
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.4s;
+    z-index: 9999;
+    font-size: 1rem;
+  "></div>
 </body>
 </html>
